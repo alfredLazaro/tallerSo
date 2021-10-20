@@ -1,0 +1,43 @@
+//prueba con git
+
+semaphore Administrador=1;
+semaphore Estudiante=1;
+int i=0;
+int total=11;
+void estudiante(int id){
+	wait(Estudiante);	
+	wait(Administrador);
+	
+	if(i<11){  //se termina ejecutando el mismo proceso 11 veces
+	     //wait(Estudiante); //se doble bloquea
+	     cout<<"estudiante "<<id<<"  entra en la habitacion"<<'\n';
+	    i=1;
+	    i=i+1;
+	  signal(Estudiante);
+	 }else{
+		signal(Administrador); //esta variable es depende
+	   cout<<"SSssale estudiante "<<id<<"  sale de la habitacion"<<'\n';
+	} 
+	
+	  if(i>10){
+	   
+	  }
+}
+
+void administrador(int id){
+	wait(Estudiante);
+	cout<<"         Administrador "<<id<<" entra en la habitacion"<<'\n';
+	cout<<"         Administrador "<<id<<" revisa la habitacion "<<'\n';
+	cout<<"         Administrador "<<id<<" sale de la habitacion "<<'\n';
+	signal(Estudiante);
+}
+
+
+
+void main(){
+	cobegin{
+	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);estudiante(7);estudiante(8);
+	estudiante(9);estudiante(10);estudiante(11);
+	administrador(99);
+	}
+}
