@@ -1,46 +1,76 @@
 BACI System: C-- to PCODE Compiler, 12:29  18 Jul 2004
-Source file: C:\jbaci\examples\trabajoGrup\trabajoGrupal.cm  Tue Oct 19 21:35:28 2021
+Source file: C:\jbaci\examples\trabajoGrup\trabajoGrupal.cm  Wed Oct 20 21:39:25 2021
  line  pc
    1    0  //prueba con git
    2    0  
    3    0  semaphore Administrador=1;
    4    0  semaphore Estudiante=1;
-   5    0  int i=0;
-   6    0  int total=11;
-   7    0  void estudiante(int id){
-   8    0  	wait(Estudiante);	
-   9    2  	wait(Administrador);
-  10    4  	
-  11    4  	if(i<11){  //se termina ejecutando el mismo proceso 11 veces
-  12    8  	     //wait(Estudiante); //se doble bloquea
-  13    8  	     cout<<"estudiante "<<id<<"  entra en la habitacion"<<'\n';
-  14   14  	    i=1;
-  15   17  	    i=i+1;
-  16   22  	  signal(Estudiante);
-  17   24  	 }else{
-  18   25  		signal(Administrador); //esta variable es depende
-  19   27  	   cout<<"SSssale estudiante "<<id<<"  sale de la habitacion"<<'\n';
-  20   33  	} 
-  21   33  	
-  22   33  	  if(i>10){
-  23   37  	   
-  24   37  	  }
-  25   37  }
-  26   38  
-  27   38  void administrador(int id){
-  28   38  	wait(Estudiante);
-  29   40  	cout<<"         Administrador "<<id<<" entra en la habitacion"<<'\n';
-  30   46  	cout<<"         Administrador "<<id<<" revisa la habitacion "<<'\n';
-  31   52  	cout<<"         Administrador "<<id<<" sale de la habitacion "<<'\n';
-  32   58  	signal(Estudiante);
-  33   60  }
-  34   61  
-  35   61  
-  36   61  
-  37   61  void main(){
-  38   62  	cobegin{
-  39   63  	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);estudiante(7);estudiante(8);
-  40   95  	estudiante(9);estudiante(10);estudiante(11);
-  41  107  	administrador(99);
-  42  111  	}
-  43  112  }
+   5    0  semaphore adSale=0;
+   6    0  semaphore estSale=0;
+   7    0  int i=0;
+   8    0  int total=11;
+   9    0  int entra=1;
+  10    0  void estudiante(int id){
+  11    0  	wait(Estudiante);
+  12    2  	//wait(Administrador); //espera que no interrumpa el admin
+  13    2  	if(i<11){  //se termina ejecutando el mismo proceso 11 veces
+  14    6  
+  15    6  	     cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
+  16   12  	    i++;
+  17   17  	  signal(Estudiante); //no deberia entrar hasta que el admin salga intentara entrar pero sino signal(estudiante)
+  18   19  		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
+  19   25  		i--;
+  20   30  	 }else{
+  21   31  		entra=1;
+  22   34  		if(total==0){
+  23   38  			entra=0;
+  24   41  			i=0; //esto 
+  25   44  			signal(Administrador); //para que salga
+  26   46  		}else{
+  27   47  		signal(Administrador); //esta variable es depende //vuelve a llamar pero no deberia creo
+  28   49  			wait(estSale);	
+  29   51  	   cout<<"SSssale estudiante "<<id<<"  sale de la habitacion"<<'\n';	
+  30   57  			//total tambien podria ponerse aqui?
+  31   57  		}
+  32   57  	} 
+  33   57  	
+  34   57  }
+  35   58  
+  36   58  void administrador(int id){
+  37   58  	wait(Administrador);
+  38   60  	while(1){
+  39   62  	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
+  40   68  	
+  41   68  	if(entra=1 || i==0){ 
+  42   76  	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
+  43   82  	wait(Estudiante); //se detiene el que estudiantes entren
+  44   84  	
+  45   84  	if(total>0){ //en este caso i cumple en caso //siempre sera 11
+  46   88  	
+  47   88  	if(i!=0){
+  48   92  	signal(estSale);
+  49   94  	}else{}
+  50   95  	cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  51  101  	total--;
+  52  106  	}else{
+  53  107  	cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+  54  113  	}
+  55  113  	
+  56  113  	}else{
+  57  114  	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
+  58  120  	signal(Estudiante);
+  59  122  	}//entra
+  60  122  	}//while
+  61  123  	
+  62  123  }
+  63  124  
+  64  124  
+  65  124  
+  66  124  void main(){
+  67  125  	cobegin{
+  68  126  	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);
+  69  150  	estudiante(7);estudiante(8);
+  70  158  	estudiante(9);estudiante(10);estudiante(11);
+  71  170  	administrador(99);
+  72  174  	}
+  73  175  }
