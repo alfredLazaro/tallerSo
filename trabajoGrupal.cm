@@ -3,20 +3,21 @@
 semaphore Administrador=1;
 semaphore Estudiante=1;
 semaphore adSale=0;
-semaphore estSale=0;
+semaphore estSale=1;
 int i=0;
 int total=11;
 int entra=1;
 void estudiante(int id){
 	wait(Estudiante);
-	//wait(Administrador); //espera que no interrumpa el admin
 	if(i<11){  //se termina ejecutando el mismo proceso 11 veces
 
 	     cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
 	    i++;
-	  signal(Estudiante); //no deberia entrar hasta que el admin salga intentara entrar pero sino signal(estudiante)
+	  signal(Estudiante); //no deberia entrar 
+	  //creo que es buena idea poner un estSal aqui
 		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
 		i--;
+	  	
 	 }else{
 		entra=1;
 		if(total==0){
@@ -35,29 +36,34 @@ void estudiante(int id){
 
 void administrador(int id){
 	wait(Administrador);
-	while(1){
+	wait(Estudiante); //se detiene el que estudiantes entren
+	//while(1){
 	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
 	
 	if(entra=1 || i==0){ 
 	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
-	wait(Estudiante); //se detiene el que estudiantes entren
+	
 	
 	if(total>0){ //en este caso i cumple en caso //siempre sera 11
 	
-	if(i!=0){
-	signal(estSale);
-	}else{}
-	cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
-	total--;
+	 if(i!=0){
+	  signal(estSale);
+	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	 }else{
+	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	 }
+	 //cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	 total--;
 	}else{
-	cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+	 cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+	 signal(Estudiante); //permite entrar estudiantes ya que salio
 	}
 	
 	}else{
 	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
 	signal(Estudiante);
 	}//entra
-	}//while
+	//}//while
 	
 }
 
