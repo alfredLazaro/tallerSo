@@ -4,20 +4,25 @@ semaphore Administrador=1;
 semaphore Estudiante=1;
 semaphore adSale=0;
 semaphore estSale=0;
+semaphore adInten=1;
 int i=0;
-int total=5;
+int total=2;
 int entra=1;
 void estudiante(int id){
 	wait(Estudiante);
-	if(i<5){  //se termina ejecutando el mismo proceso 11 veces
-
+	if(i<2){ 
 	     cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
-	    i++;
-	  signal(Estudiante); //no deberia entrar 
+	     i++;
+	  signal(Estudiante);
+	  signal(Administrador);
+	  signal(estSale);
+	   i--;
+	  	total--; 
+	  
 	  //creo que es buena idea poner un estSal aqui
 		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
-		i--;
-	  	total--;
+		
+	  wait(estSale);
 	 }else{
 		entra=1;
 		if(total==0){
@@ -35,11 +40,11 @@ void estudiante(int id){
 }
 
 void administrador(int id){
-	wait(Administrador);
-	
-	//while(1){
-	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
 	wait(Estudiante); //se detiene el que estudiantes entren
+	wait(Administrador);
+	wait(adInten);
+	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
+	
 	if(entra=1 || i==0){ 
 	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
 	
@@ -48,9 +53,11 @@ void administrador(int id){
 	 if(i!=0){
 	  signal(estSale); //si no esta encendida -1
 	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+
 	  signal(Estudiante); //por si hay estudiante que no terminaron
 	 }else{
 	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	  cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
 	  signal(Estudiante);
 	 }
 	 //cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
@@ -64,7 +71,7 @@ void administrador(int id){
 	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
 	signal(Estudiante);
 	}//entra
-	//}//while
+	signal(adInten);
 	
 }
 
@@ -75,6 +82,8 @@ void main(){
 	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);
 	estudiante(7);estudiante(8);
 	estudiante(9);estudiante(10);estudiante(11);
+	while(1){
 	administrador(99);
+	}
 	}
 }

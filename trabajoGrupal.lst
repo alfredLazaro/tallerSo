@@ -1,5 +1,5 @@
 BACI System: C-- to PCODE Compiler, 12:29  18 Jul 2004
-Source file: C:\jbaci\examples\trabajoGrup\trabajoGrupal.cm  Thu Oct 21 15:34:08 2021
+Source file: C:\jbaci\examples\trabajoGrup\trabajoGrupal.cm  Fri Oct 22 12:38:52 2021
  line  pc
    1    0  //prueba con git
    2    0  
@@ -7,77 +7,86 @@ Source file: C:\jbaci\examples\trabajoGrup\trabajoGrupal.cm  Thu Oct 21 15:34:08
    4    0  semaphore Estudiante=1;
    5    0  semaphore adSale=0;
    6    0  semaphore estSale=0;
-   7    0  int i=0;
-   8    0  int total=5;
-   9    0  int entra=1;
-  10    0  void estudiante(int id){
-  11    0  	wait(Estudiante);
-  12    2  	if(i<5){  //se termina ejecutando el mismo proceso 11 veces
-  13    6  
+   7    0  semaphore adInten=1;
+   8    0  int i=0;
+   9    0  int total=2;
+  10    0  int entra=1;
+  11    0  void estudiante(int id){
+  12    0  	wait(Estudiante);
+  13    2  	if(i<2){ 
   14    6  	     cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
-  15   12  	    i++;
-  16   17  	  signal(Estudiante); //no deberia entrar 
-  17   19  	  //creo que es buena idea poner un estSal aqui
-  18   19  		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
-  19   25  		i--;
-  20   30  	  	total--;
-  21   35  	 }else{
-  22   36  		entra=1;
-  23   39  		if(total==0){
-  24   43  			entra=0;
-  25   46  			i=0; //esto 
-  26   49  			signal(Administrador); //para que salga
-  27   51  		}else{
-  28   52  		signal(Administrador); //esta variable es depende //vuelve a llamar pero no deberia creo
-  29   54  			wait(estSale);	
-  30   56  	   cout<<"SSssale estudiante "<<id<<"  sale de la habitacion"<<'\n';	
-  31   62  			//total tambien podria ponerse aqui?
-  32   62  		}
-  33   62  	} 
-  34   62  	
-  35   62  }
-  36   63  
-  37   63  void administrador(int id){
-  38   63  	wait(Administrador);
-  39   65  	
-  40   65  	//while(1){
-  41   65  	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
-  42   71  	wait(Estudiante); //se detiene el que estudiantes entren
-  43   73  	if(entra=1 || i==0){ 
-  44   81  	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
-  45   87  	
-  46   87  	if(total>0){ //en este caso i cumple en caso //siempre sera 11
-  47   91  	
-  48   91  	 if(i!=0){
-  49   95  	  signal(estSale); //si no esta encendida -1
-  50   97  	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
-  51  103  	  signal(Estudiante); //por si hay estudiante que no terminaron
-  52  105  	 }else{
-  53  106  	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
-  54  112  	  signal(Estudiante);
-  55  114  	 }
-  56  114  	 //cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
-  57  114  	 total--;
-  58  119  	}else{
-  59  120  	 cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
-  60  126  	 signal(Estudiante); //permite entrar estudiantes ya que salio
-  61  128  	}
-  62  128  	
-  63  128  	}else{
-  64  129  	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
-  65  135  	signal(Estudiante);
-  66  137  	}//entra
-  67  137  	//}//while
-  68  137  	
-  69  137  }
-  70  138  
-  71  138  
-  72  138  
-  73  138  void main(){
-  74  139  	cobegin{
-  75  140  	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);
-  76  164  	estudiante(7);estudiante(8);
-  77  172  	estudiante(9);estudiante(10);estudiante(11);
-  78  184  	administrador(99);
-  79  188  	}
-  80  189  }
+  15   12  	     i++;
+  16   17  	  signal(Estudiante);
+  17   19  	  signal(Administrador);
+  18   21  	  signal(estSale);
+  19   23  	   i--;
+  20   28  	  	total--; 
+  21   33  	  
+  22   33  	  //creo que es buena idea poner un estSal aqui
+  23   33  		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
+  24   39  		
+  25   39  	  wait(estSale);
+  26   41  	 }else{
+  27   42  		entra=1;
+  28   45  		if(total==0){
+  29   49  			entra=0;
+  30   52  			i=0; //esto 
+  31   55  			signal(Administrador); //para que salga
+  32   57  		}else{
+  33   58  		signal(Administrador); //esta variable es depende //vuelve a llamar pero no deberia creo
+  34   60  			wait(estSale);	
+  35   62  	   cout<<"SSssale estudiante "<<id<<"  sale de la habitacion"<<'\n';	
+  36   68  			//total tambien podria ponerse aqui?
+  37   68  		}
+  38   68  	} 
+  39   68  	
+  40   68  }
+  41   69  
+  42   69  void administrador(int id){
+  43   69  	wait(Estudiante); //se detiene el que estudiantes entren
+  44   71  	wait(Administrador);
+  45   73  	wait(adInten);
+  46   75  	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
+  47   81  	
+  48   81  	if(entra=1 || i==0){ 
+  49   89  	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
+  50   95  	
+  51   95  	if(total>0){ //en este caso i cumple en caso //siempre sera 11
+  52   99  	
+  53   99  	 if(i!=0){
+  54  103  	  signal(estSale); //si no esta encendida -1
+  55  105  	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  56  111  
+  57  111  	  signal(Estudiante); //por si hay estudiante que no terminaron
+  58  113  	 }else{
+  59  114  	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  60  120  	  cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+  61  126  	  signal(Estudiante);
+  62  128  	 }
+  63  128  	 //cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  64  128  	 total--;
+  65  133  	}else{
+  66  134  	 cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+  67  140  	 signal(Estudiante); //permite entrar estudiantes ya que salio
+  68  142  	}
+  69  142  	
+  70  142  	}else{
+  71  143  	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
+  72  149  	signal(Estudiante);
+  73  151  	}//entra
+  74  151  	signal(adInten);
+  75  153  	
+  76  153  }
+  77  154  
+  78  154  
+  79  154  
+  80  154  void main(){
+  81  155  	cobegin{
+  82  156  	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);
+  83  180  	estudiante(7);estudiante(8);
+  84  188  	estudiante(9);estudiante(10);estudiante(11);
+  85  200  	while(1){
+  86  202  	administrador(99);
+  87  206  	}
+  88  207  	}
+  89  208  }

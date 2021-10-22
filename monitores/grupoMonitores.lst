@@ -1,0 +1,89 @@
+BACI System: C-- to PCODE Compiler, 12:29  18 Jul 2004
+Source file: C:\jbaci\examples\trabajoGrup\monitores\grupoMonitores.cm  Thu Oct 21 18:55:58 2021
+ line  pc
+   1    0  //prueba con git
+   2    0  
+   3    0  monitor Revision{
+   4    0  	int N;
+   5    0   condition Administrador;
+   6    0   condition Estudiante;
+   7    0   condition adSale;
+   8    0   condition estSale;
+   9    0  int i=0;
+  10    0  int total=5;
+  11    0  int entra=1;
+  12    0  void estudiante(int id){
+  13    1  	if(N==1){
+  14    5  	waitc(Estudiante);
+  15    8  	N=1;
+  16   11  	if(i<5){  //se termina ejecutando el mismo proceso 11 veces
+  17   15  
+  18   15  	    cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
+  19   21  	    i++;
+  20   26  	  signalc(Estudiante); //no deberia entrar 
+  21   28  	  //creo que es buena idea poner un estSal aqui
+  22   28  		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
+  23   34  		i--;
+  24   39  	  	total--;
+  25   44  	 }else{
+  26   45  		
+  27   45  		
+  28   45  		
+  29   45  	} //else
+  30   45  	} //
+  31   45  	
+  32   45  }
+  33   47  
+  34   47  void administrador(int id){
+  35   48  	if(N==0){
+  36   52  	waitc(Administrador);
+  37   55  	 N=0;
+  38   58  	//while(1){
+  39   58  	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
+  40   64  	waitc(Estudiante); //se detiene el que estudiantes entren
+  41   67  	if(entra=1 || i==0){ 
+  42   75  	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
+  43   81  	
+  44   81  	if(total>0){ //en este caso i cumple en caso //siempre sera 11
+  45   85  	
+  46   85  	 if(i!=0){
+  47   89  	  signalc(estSale); //si no esta encendida -1
+  48   91  	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  49   97  	  signalc(Estudiante); //por si hay estudiante que no terminaron
+  50   99  	 }else{
+  51  100  	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  52  106  	  signalc(Estudiante);
+  53  108  	 }
+  54  108  	 //cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+  55  108  	 total--;
+  56  113  	}else{
+  57  114  	 cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+  58  120  	 signalc(Estudiante); //permite entrar estudiantes ya que salio
+  59  122  	}
+  60  122  	
+  61  122  	}else{
+  62  123  	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
+  63  129  	signalc(Estudiante);
+  64  131  	}//entra
+  65  131  	//}//while
+  66  131  	}//if
+  67  131  }
+  68  133  init{
+  69  142  	N=0;
+  70  145  }
+  71  146  
+  72  146  }//monitor
+  73  146  void estEntra(int ID){
+  74  146  	estudiante(ID);
+  75  150  }
+  76  151  void adminRev(int ID){
+  77  151  	administrador(ID);
+  78  155  }
+  79  156  void main(){
+  80  157  	cobegin{
+  81  158  	estEntra(1);estEntra(2);estEntra(3);estEntra(4);estEntra(5);estEntra(6);
+  82  182  	estEntra(7);estEntra(8);
+  83  190  	estEntra(9);estEntra(10);estEntra(11);
+  84  202  	adminRev(99);
+  85  206  	}
+  86  207  }

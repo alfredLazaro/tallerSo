@@ -1,0 +1,86 @@
+//prueba con git
+
+monitor Revision{
+	int N;
+ condition Administrador;
+ condition Estudiante;
+ condition adSale;
+ condition estSale;
+int i=0;
+int total=5;
+int entra=1;
+void estudiante(int id){
+	if(N==1){
+	waitc(Estudiante);
+	N=1;
+	if(i<5){  //se termina ejecutando el mismo proceso 11 veces
+
+	    cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
+	    i++;
+	  signalc(Estudiante); //no deberia entrar 
+	  //creo que es buena idea poner un estSal aqui
+		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
+		i--;
+	  	total--;
+	 }else{
+		
+		
+		
+	} //else
+	} //
+	
+}
+
+void administrador(int id){
+	if(N==0){
+	waitc(Administrador);
+	 N=0;
+	//while(1){
+	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
+	waitc(Estudiante); //se detiene el que estudiantes entren
+	if(entra=1 || i==0){ 
+	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
+	
+	if(total>0){ //en este caso i cumple en caso //siempre sera 11
+	
+	 if(i!=0){
+	  signalc(estSale); //si no esta encendida -1
+	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	  signalc(Estudiante); //por si hay estudiante que no terminaron
+	 }else{
+	  cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	  signalc(Estudiante);
+	 }
+	 //cout<<"         RAdministrador "<<id<<" revisa la habitacion "<<'\n';
+	 total--;
+	}else{
+	 cout<<"         SAdministrador "<<id<<" sale de la habitacion "<<'\n';
+	 signalc(Estudiante); //permite entrar estudiantes ya que salio
+	}
+	
+	}else{
+	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
+	signalc(Estudiante);
+	}//entra
+	//}//while
+	}//if
+}
+init{
+	N=0;
+}
+
+}//monitor
+void estEntra(int ID){
+	estudiante(ID);
+}
+void adminRev(int ID){
+	administrador(ID);
+}
+void main(){
+	cobegin{
+	estEntra(1);estEntra(2);estEntra(3);estEntra(4);estEntra(5);estEntra(6);
+	estEntra(7);estEntra(8);
+	estEntra(9);estEntra(10);estEntra(11);
+	adminRev(99);
+	}
+}
