@@ -1,9 +1,9 @@
 //prueba con git
 
 semaphore Administrador=1;
-semaphore Estudiante=1;
+semaphore Estudiante=0;
 semaphore adSale=0;
-semaphore estSale=0;
+semaphore estSale=1;
 semaphore adInten=1;
 int i=0;
 int total=2;
@@ -13,16 +13,17 @@ void estudiante(int id){
 	if(i<2){ 
 	     cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
 	     i++;
+	     cout<<"Hay "<<i<<" en la habitacion"<<'\n';
 	  signal(Estudiante);
-	  signal(Administrador);
-	  signal(estSale);
-	   i--;
+	  signal(Administrador); //desde el pricipio puede
+	  wait(estSale);
+	     	i--;
 	  	total--; 
-	  
 	  //creo que es buena idea poner un estSal aqui
 		cout<<"Sssaaale estudiante "<<id<<" sale de la habitacion"<<'\n';
-		
-	  wait(estSale);
+		cout<<"Hay "<<i<<" en la habitacion"<<'\n';
+	  signal(estSale);
+	   
 	 }else{
 		entra=1;
 		if(total==0){
@@ -40,7 +41,7 @@ void estudiante(int id){
 }
 
 void administrador(int id){
-	wait(Estudiante); //se detiene el que estudiantes entren
+	//wait(Estudiante); //se detiene el que estudiantes entren
 	wait(Administrador);
 	wait(adInten);
 	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
