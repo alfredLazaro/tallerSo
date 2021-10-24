@@ -1,0 +1,104 @@
+semaphore puerta=1;  //puerta cierra a todos?
+semaphore permitido=1; //
+semaphore habVacia=1;  //
+semaphore inspeccion=1;  //
+int cantEst=0;	//el administrador verifica esto
+int vacia=1;	//bandera de vacia
+int accesoDenegado=0;  //0 el AD no esta (Entra) 1 AD esta (Sale)
+int estMax=10;  //para saber si hay fiesta
+
+void estudiante(int ID){
+  int sale;
+  //entrada de estudiante
+  wait(puerta);
+  if(accesoDenegado==1){
+    //permite la salida de est y espera q salga el admi
+    cout<<"estudiante "<<ID<<" no logra ingresar"<<endl;
+    signal(puerta);
+    wait(permitido);
+    signal(permitido);
+    wait(puerta);
+  }
+  cout<<"estudiante "<<ID<<" entra a la habitacion"<<endl;
+  cantEst= cantEst+1;
+  cout<<"hay "<<cantEst <<"estudiantes"<<endl;
+  if(cantEst>0){        //no entiendo para que?
+       if(vacia==1){
+         //modifica si la habitacion esta vacia
+             wait(habVacia);                    //empieza vacia
+             vacia=0;
+       }
+     }
+  if(cantEst>estMax){
+     cout<<"hay fiesta"<<endl;
+  }
+signal(puerta);					//puede seguir preguntando
+
+       
+// ALGUIEN SALE
+ wait(puerta);
+ cantEst=cantEst-1;
+cout<<"estudiante "<<ID<<" sale de la habitacion"<<endl;
+cout<<"hay "<<cantEst<<" estudiantes"<<endl;
+  if(cantEst==0){
+    if(vacia==0){
+     //modifica si la habitacion ocupada
+    signal(habVacia);				//puede seguir sacando estudiantes
+    vacia=1;
+   
+   }
+ }
+signal(puerta);
+  }
+void administrador(int ID){
+   int i=0;
+     
+   //while(1){
+       wait(inspeccion);
+	
+       wait(puerta);   //como no sale un error?
+wait(permitido);
+
+ cout<<"Administrador "<<ID<<" intenta ingresar"<<endl;
+   if(cantEst==0){
+      i=i+1;
+    cout<<"Administrador "<<ID<<" entra a habitacion vacia"<<endl;
+    cout<<"Administrador "<<ID<<" inspecciona"<<endl;
+    cout<<"Administrador "<<ID<<" sale de la habitacion"<<endl;
+    signal(puerta);  //aqui lo libera
+    signal(permitido); //aqui lo libera
+    }else{
+        if(cantEst>estMax){
+              i=0;
+             cout<<"Administrador "<<ID<<" entra a la fiesta"<<endl;
+            accesoDenegado=1;  //bloqueo estudiantes
+            signal(puerta); //permite que el estudiante pregunte (entra/sale)
+
+          wait(habVacia);  //ejecuta seccion critica
+          accesoDenegado=0;
+       cout<<"Salieron todos los estudiantes"<<endl;
+       cout<<"Administrador "<<ID<<" sale de la habitacion"<<endl;
+       signal(permitido);
+       signal(habVacia);
+       }else{
+       cout<<"Administrador "<<ID<<" no logra ingresar"<<endl;
+            signal(puerta);
+            signal(permitido);      
+         }
+     }
+
+  signal(inspeccion);
+  //if(i>2)break; 
+   //}
+ cout<<"administrador "<<ID<<" deja de supervisar"<<endl;
+}
+void main(){
+  cobegin{
+	administrador(1);
+	estudiante(1);
+   }
+  }
+
+
+
+

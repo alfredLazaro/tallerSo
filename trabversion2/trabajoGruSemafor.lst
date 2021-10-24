@@ -1,0 +1,44 @@
+BACI System: C-- to PCODE Compiler, 12:29  18 Jul 2004
+Source file: C:\jbaci\examples\trabajoGrup\trabversion2\trabajoGruSemafor.cm  Sat Oct 23 17:07:39 2021
+ line  pc
+   1    0  semaphore Administrador=1;
+   2    0  semaphore Estudiante=1;
+   3    0  semaphore adEnt=0;
+   4    0  semaphore adSale=0;
+   5    0  semaphore estSale=1;
+   6    0  semaphore adInten=1;
+   7    0  int blockAd=1;
+   8    0  void estudiante(int id){
+   9    0  	wait(Estudiante);
+  10    2  	if(blockAd==1){
+  11    6  	  wait(Administrador); //solo detiene una vez
+  12    8  	  blockAd=0;
+  13   11  	  cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
+  14   17  	
+  15   17  	  signal(Estudiante);
+  16   19  	}else{
+  17   20  	  signal(Administrador);
+  18   22  	}
+  19   22  	
+  20   22  	
+  21   22  }
+  22   23  
+  23   23  void administrador(int id){
+  24   23  	wait(Administrador);
+  25   25  	//wait(Estudiante);
+  26   25  	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n';
+  27   31  	signal(Administrador);
+  28   33  	//signal(Estudiante);
+  29   33  }
+  30   34  
+  31   34  void main(){
+  32   35  	cobegin{
+  33   36  	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);
+  34   60  	estudiante(7);estudiante(8);
+  35   68  	estudiante(9);estudiante(10);estudiante(11);
+  36   80  	while(1){
+  37   82  	administrador(99);
+  38   86  	administrador(66);
+  39   90  	}
+  40   91  	}
+  41   92  }

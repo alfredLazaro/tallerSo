@@ -1,0 +1,107 @@
+BACI System: C-- to PCODE Compiler, 12:29  18 Jul 2004
+Source file: C:\jbaci\examples\trabajoGrup\codigoMedias\codigoAmedias.cm  Sat Oct 23 18:14:01 2021
+ line  pc
+   1    0  semaphore puerta=1;  //puerta cierra a todos?
+   2    0  semaphore permitido=1; //
+   3    0  semaphore habVacia=1;  //
+   4    0  semaphore inspeccion=1;  //
+   5    0  int cantEst=0;	//el administrador verifica esto
+   6    0  int vacia=1;	//bandera de vacia
+   7    0  int accesoDenegado=0;  //0 el AD no esta (Entra) 1 AD esta (Sale)
+   8    0  int estMax=10;  //para saber si hay fiesta
+   9    0  
+  10    0  void estudiante(int ID){
+  11    0    int sale;
+  12    0    //entrada de estudiante
+  13    0    wait(puerta);
+  14    2    if(accesoDenegado==1){
+  15    6      //permite la salida de est y espera q salga el admi
+  16    6      cout<<"estudiante "<<ID<<" no logra ingresar"<<endl;
+  17   11      signal(puerta);
+  18   13      wait(permitido);
+  19   15      signal(permitido);
+  20   17      wait(puerta);
+  21   19    }
+  22   19    cout<<"estudiante "<<ID<<" entra a la habitacion"<<endl;
+  23   24    cantEst= cantEst+1;
+  24   29    cout<<"hay "<<cantEst <<"estudiantes"<<endl;
+  25   34    if(cantEst>0){        //no entiendo para que?
+  26   38         if(vacia==1){
+  27   42           //modifica si la habitacion esta vacia
+  28   42               wait(habVacia);                    //empieza vacia
+  29   44               vacia=0;
+  30   47         }
+  31   47       }
+  32   47    if(cantEst>estMax){
+  33   51       cout<<"hay fiesta"<<endl;
+  34   53    }
+  35   53  signal(puerta);					//puede seguir preguntando
+  36   55  
+  37   55         
+  38   55  // ALGUIEN SALE
+  39   55   wait(puerta);
+  40   57   cantEst=cantEst-1;
+  41   62  cout<<"estudiante "<<ID<<" sale de la habitacion"<<endl;
+  42   67  cout<<"hay "<<cantEst<<" estudiantes"<<endl;
+  43   72    if(cantEst==0){
+  44   76      if(vacia==0){
+  45   80       //modifica si la habitacion ocupada
+  46   80      signal(habVacia);				//puede seguir sacando estudiantes
+  47   82      vacia=1;
+  48   85     
+  49   85     }
+  50   85   }
+  51   85  signal(puerta);
+  52   87    }
+  53   88  void administrador(int ID){
+  54   88     int i=0;
+  55   91       
+  56   91     //while(1){
+  57   91         wait(inspeccion);
+  58   93  	
+  59   93         wait(puerta);   //como no sale un error?
+  60   95  wait(permitido);
+  61   97  
+  62   97   cout<<"Administrador "<<ID<<" intenta ingresar"<<endl;
+  63  102     if(cantEst==0){
+  64  106        i=i+1;
+  65  111      cout<<"Administrador "<<ID<<" entra a habitacion vacia"<<endl;
+  66  116      cout<<"Administrador "<<ID<<" inspecciona"<<endl;
+  67  121      cout<<"Administrador "<<ID<<" sale de la habitacion"<<endl;
+  68  126      signal(puerta);  //aqui lo libera
+  69  128      signal(permitido); //aqui lo libera
+  70  130      }else{
+  71  131          if(cantEst>estMax){
+  72  135                i=0;
+  73  138               cout<<"Administrador "<<ID<<" entra a la fiesta"<<endl;
+  74  143              accesoDenegado=1;  //bloqueo estudiantes
+  75  146              signal(puerta); //permite que el estudiante pregunte (entra/sale)
+  76  148  
+  77  148            wait(habVacia);  //ejecuta seccion critica
+  78  150            accesoDenegado=0;
+  79  153         cout<<"Salieron todos los estudiantes"<<endl;
+  80  155         cout<<"Administrador "<<ID<<" sale de la habitacion"<<endl;
+  81  160         signal(permitido);
+  82  162         signal(habVacia);
+  83  164         }else{
+  84  165         cout<<"Administrador "<<ID<<" no logra ingresar"<<endl;
+  85  170              signal(puerta);
+  86  172              signal(permitido);      
+  87  174           }
+  88  174       }
+  89  174  
+  90  174    signal(inspeccion);
+  91  176    //if(i>2)break; 
+  92  176     //}
+  93  176   cout<<"administrador "<<ID<<" deja de supervisar"<<endl;
+  94  181  }
+  95  182  void main(){
+  96  183    cobegin{
+  97  184  	administrador(1);
+  98  188  	estudiante(1);
+  99  192     }
+ 100  193    }
+ 101  219  
+ 102  219  
+ 103  219  
+ 104  219  

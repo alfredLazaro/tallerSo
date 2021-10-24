@@ -1,7 +1,8 @@
 //prueba con git
 
 semaphore Administrador=1;
-semaphore Estudiante=0;
+semaphore Estudiante=1;
+semaphore adEnt=0;
 semaphore adSale=0;
 semaphore estSale=1;
 semaphore adInten=1;
@@ -41,14 +42,16 @@ void estudiante(int id){
 }
 
 void administrador(int id){
-	//wait(Estudiante); //se detiene el que estudiantes entren
+	wait(Estudiante); 
 	wait(Administrador);
 	wait(adInten);
 	cout<<"		IAdministrador "<<id<<" intentaaaa ENTRAR"<<'\n';
 	
+	signal(adInten);
+	
 	if(entra=1 || i==0){ 
 	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n'; //solo pasa
-	
+	 //se detiene el que estudiantes entren
 	if(total>0){ //en este caso i cumple en caso //siempre sera 11
 	
 	 if(i!=0){
@@ -72,7 +75,7 @@ void administrador(int id){
 	cout<<" 	Administrador "<<id<<" no logra entrar "<<'\n';
 	signal(Estudiante);
 	}//entra
-	signal(adInten);
+	
 	
 }
 
@@ -85,6 +88,7 @@ void main(){
 	estudiante(9);estudiante(10);estudiante(11);
 	while(1){
 	administrador(99);
+	administrador(66);
 	}
 	}
 }

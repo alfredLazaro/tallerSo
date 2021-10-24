@@ -10,7 +10,7 @@ int i=0;
 int total=5;
 int entra=1;
 void estudiante(int id){
-	if(N==1){
+	if(N==0){
 	waitc(Estudiante);
 	N=1;
 	if(i<5){  //se termina ejecutando el mismo proceso 11 veces
@@ -24,15 +24,13 @@ void estudiante(int id){
 	  	total--;
 	 }else{
 		
-		
-		
 	} //else
 	} //
 	
 }
 
 void administrador(int id){
-	if(N==0){
+	if(N==11){
 	waitc(Administrador);
 	 N=0;
 	//while(1){

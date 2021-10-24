@@ -1,0 +1,41 @@
+semaphore Administrador=1;
+semaphore Estudiante=1;
+semaphore adEnt=0;
+semaphore adSale=0;
+semaphore estSale=1;
+semaphore adInten=1;
+int blockAd=1;
+void estudiante(int id){
+	wait(Estudiante);
+	if(blockAd==1){
+	  wait(Administrador); //solo detiene una vez
+	  blockAd=0;
+	  cout<<"ESTUDIANTE "<<id<<"  entra en la habitacion"<<'\n';
+	
+	  signal(Estudiante);
+	}else{
+	  signal(Administrador);
+	}
+	
+	
+}
+
+void administrador(int id){
+	wait(Administrador);
+	//wait(Estudiante);
+	cout<<"         EAdministrador "<<id<<" entra en la habitacion"<<'\n';
+	signal(Administrador);
+	//signal(Estudiante);
+}
+
+void main(){
+	cobegin{
+	estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);estudiante(6);
+	estudiante(7);estudiante(8);
+	estudiante(9);estudiante(10);estudiante(11);
+	while(1){
+	administrador(99);
+	administrador(66);
+	}
+	}
+}
