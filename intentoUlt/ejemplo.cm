@@ -1,6 +1,6 @@
 semaphore acceso=1; //puerta
 semaphore adminIN=1; //administrador
-semaphore estSale=0;
+semaphore estSale=1;
 int adminAdentro=0;
 int habVacia=0;
 int cantEst=0;
@@ -24,20 +24,18 @@ void estudiante(int id){
 				habVacia=1;
 				cantEst++;
 				cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
-				signal(estSale);
+				
 				signal(acceso);
 				
 				
 				
-				//signal(estSale);
-				//signal(acceso);
                              }
 //fuera de else
-                             wait(estSale); //si es asi se debe liberar el para no alterar el semaphoro
+                             wait(estSale);
                                if(habVacia==1){
-				cout<<" LIIIIIBBBEERRAA "<<id<<'\n';
+				cout<<"	IIISalir Estudiante"<<'\n';
 				numRandom = random(3);
-				if((terminaFiesta==1)||numRandom==0){
+				if((terminaFiesta==1)||numRandom==0){   //no hace la comparacion con terminaFies
 					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 					cantEst--;
 					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
@@ -48,7 +46,7 @@ void estudiante(int id){
 						signal(estSale);
 						}
 					
-                                  }
+                                  } else{  cout<<"  NO Sale    "<<'\n';  signal(adminIN);  }//si no sale?
                               } //IF habVacia
    // signal(estSale);
 }
@@ -70,17 +68,16 @@ void administrador(int id){
 				cout<<"      Revisa Administrador"<<id<<endl;	
 				terminaFiesta=1;
 				adminAdentro=1;
-				//controlar si esta vacia para salir
 				wait(adminIN);
 				if(habVacia==0){
-				  cout<<"      SALE Administrador"<<id<<endl;	
-				  adminAdentro=0;
-				  signal(adminIN);
+					cout<<"      SALE Administrador"<<id<<endl;
+					adminAdentro=0;
+					signal(adminIN);
 				}else{
-				  //cout<<" LIIIIIBBBEERRAA"<<id<<'\n';
-				  signal(estSale);
+					signal(estSale);
 				}
 				
+
                               }else{ 
 				cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
                               }
