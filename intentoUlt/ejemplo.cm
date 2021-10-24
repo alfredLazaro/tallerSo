@@ -27,15 +27,13 @@ void estudiante(int id){
 				
 				signal(acceso);
 				
-				
-				
-                             }
+                             } //else estEntra
 //fuera de else
                              wait(estSale);
                                if(habVacia==1){
 				cout<<"	IIISalir Estudiante"<<'\n';
 				numRandom = random(3);
-				if((terminaFiesta==1)||numRandom==0){   //no hace la comparacion con terminaFies
+				if(numRandom==0){   //no hace la comparacion con terminaFies
 					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 					cantEst--;
 					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
@@ -43,11 +41,27 @@ void estudiante(int id){
 						habVacia=0; //administrador pueda entrar
 						signal(adminIN);
 						}else{
-						signal(estSale);
+						  signal(estSale); //todavia puede salir otro estudiante
 						}
 					
-                                  } else{  cout<<"  NO Sale    "<<'\n';  signal(adminIN);  }//si no sale?
+					
+                                 }else{  cout<<"  NO Sale    "<<'\n';
+					while(1){
+					  if(terminaFiesta==1){
+						cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
+						cantEst--;
+						cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
+						if(cantEst==0){
+						  habVacia=0; //administrador pueda entrar
+						  signal(adminIN);
+						}else{
+						  signal(estSale); //todavia puede salir otro estudiante
+						}//cantEs
+					   }else{break;  signal(estSale);//pausar el sale}
+					}//while
+					}//si no sale? else
                               } //IF habVacia
+              }//
    // signal(estSale);
 }
 void administrador(int id){
