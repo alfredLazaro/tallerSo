@@ -1,6 +1,6 @@
 semaphore acceso=1; //puerta
 semaphore adminIN=1; //administrador
-semaphore estSale=2;
+semaphore estSale=1;
 int adminAdentro=0;
 int habVacia=0;
 int cantEst=0;
@@ -33,7 +33,7 @@ void estudiante(int id){
                                if(habVacia==1){
 				cout<<"	IIISalir "<<id<<" Estudiante"<<'\n';
 				numRandom = random(3);
-				if(numRandom==0){   //no hace la comparacion con terminaFies
+				if(numRandom==0){   
 					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 					cantEst--;
 					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
@@ -48,7 +48,8 @@ void estudiante(int id){
 					
                                  }else{  
 					while(1){
-					  if(terminaFiesta==1 || (id!=ultSal)){
+					  if(terminaFiesta==1 ){
+						if(id!=ultSal){//no salga de nuevo	
 						cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 						cantEst--;
 						cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
@@ -65,6 +66,7 @@ void estudiante(int id){
 						  ultSal=id;
 						}//cantEs
 						//sigue habiendo estudiantes
+						}else{signal(estSale);}//no salga de nuevo							
 						
 						//break;//creo que deberia haber un wait
 					   }else{signal(adminIN);  cout<<"  NO Sale "<<id<<" Estudiante"<<'\n';break;  }//pausar el sale

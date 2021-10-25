@@ -1,6 +1,6 @@
 semaphore acceso=1; //puerta
 semaphore adminIN=1; //administrador
-semaphore estSale=0;
+semaphore estSale=1;
 int adminAdentro=0;
 int habVacia=0;
 int cantEst=0;
@@ -8,6 +8,7 @@ int cantMax=2;//varia
 int numRandom;
 int terminaFiesta=0;// no es seguro
 int votarEst=0;
+int ult=0;
 void estudiante(int id){
 int x=0;
                
@@ -16,23 +17,10 @@ int x=0;
 		cout<<"Intenta ingresar Estudiante"<<id<<endl;
 		if(adminAdentro==1){
 			cout<<"Acceso denegado Estudiante  "<<id<<endl;
-  
-			signal(acceso);
-			
-			}else{  
-				cout<<"Entra Estudiante "<<id <<" a la habitacion"<<'\n';
-				votarEst=0;
-				habVacia=1;
-				cantEst++;
-				cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
-				signal(acceso);
-                             }
-//fuera de else
-                     
-                              
-			
-				wait(acceso);  //no detiene al proceso un estudiante puede salir sin entrar
-				if(cantEst>0){
+				ult=id; //este no puede salir
+  				wait(estSale);  //no detiene al proceso un estudiante puede salir sin entrar
+				
+				if(cantEst>0 && (ult!=id)){
 					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 					cantEst--;
 					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
@@ -40,9 +28,46 @@ int x=0;
 						habVacia=0; //administrador pueda entrar
 						cout<<"Salieron todos los estudiantes"<<'\n';
 						adminAdentro=0;
+						signal(acceso);
+					}else{	
+						signal(estSale);
+						signal(acceso);
 					}
-                                }
-signal(acceso);
+					
+                                }else{signal(acceso);}
+				
+			
+			
+			}else{  
+				cout<<"Entra Estudiante "<<id <<" a la habitacion"<<'\n';
+				votarEst=0;
+				habVacia=1;
+				cantEst++;
+				cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
+				
+				wait(estSale);  //no detiene al proceso un estudiante puede salir sin entrar
+				numRandom=random(3);
+				if(cantEst>0 &&(numRandom==0)){
+					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
+					cantEst--;
+					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
+					if(cantEst==0){
+						habVacia=0; //administrador pueda entrar
+						cout<<"Salieron todos los estudiantes"<<'\n';
+						adminAdentro=0;
+						signal(acceso);
+					}else{	
+						signal(estSale);
+						signal(acceso);
+					}
+					
+                                }else{signal(acceso);}
+                             }
+//fuera de else
+                     
+                              
+			
+				
 }
 void administrador(int id){
  while(1){
