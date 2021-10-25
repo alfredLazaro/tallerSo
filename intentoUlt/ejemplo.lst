@@ -1,16 +1,16 @@
 BACI System: C-- to PCODE Compiler, 12:29  18 Jul 2004
-Source file: C:\jbaci\examples\trabajoGrup\intentoUlt\ejemplo.cm  Sun Oct 24 20:52:10 2021
+Source file: C:\jbaci\examples\trabajoGrup\intentoUlt\ejemplo.cm  Sun Oct 24 22:10:10 2021
  line  pc
    1    0  semaphore acceso=1; //puerta
    2    0  semaphore adminIN=1; //administrador
-   3    0  semaphore estSale=1;
+   3    0  semaphore estSale=2;
    4    0  int adminAdentro=0;
    5    0  int habVacia=0;
    6    0  int cantEst=0;
    7    0  int cantMax=2;//varia
    8    0  int numRandom;
    9    0  int terminaFiesta=0;// no es seguro
-  10    0  
+  10    0  int ultSal=0;
   11    0  void estudiante(int id){
   12    0  //int x=0;
   13    0                 
@@ -42,90 +42,95 @@ Source file: C:\jbaci\examples\trabajoGrup\intentoUlt\ejemplo.cm  Sun Oct 24 20:
   39   72  					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
   40   78  					if(cantEst==0){
   41   82  						habVacia=0; //administrador pueda entrar
-  42   85  						signal(adminIN);
-  43   87  						}else{
-  44   88  						  signal(estSale); //todavia puede salir otro estudiante
-  45   90  						}
-  46   90  					
-  47   90  					
-  48   90                                   }else{  
-  49   91  					while(1){
-  50   93  					  if(terminaFiesta==1 || (cantEst!=0)){
-  51  101  						cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
-  52  107  						cantEst--;
-  53  112  						cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
-  54  118  						if(cantEst==0){
-  55  122  						  habVacia=0; //administrador pueda entrar
-  56  125  						  signal(adminIN);
-  57  127  						  cout<<"TODOS salieron"<<endl;
-  58  129  						}else{
-  59  130  						  //signal(estSale); //todavia puede salir otro estudiante
-  60  130  						  signal(adminIN);  //el admin intente salir y libere 
-  61  132  						}//cantEs
-  62  132  						//sigue habiendo estudiantes
-  63  132  						
-  64  132  						//break;//creo que deberia haber un wait
-  65  132  					   }else{cout<<"  NO Sale "<<id<<" Estudiante"<<'\n';break;  }//pausar el sale
-  66  140  						
-  67  140  					}//while
-  68  141  						
-  69  141  					}//si no sale? else
-  70  141                                } //IF habVacia
-  71  141                
-  72  141     // signal(estSale);
-  73  141  }
-  74  142  void administrador(int id){
-  75  142   while(1){
-  76  144                     wait(acceso);  //
-  77  146  	if(adminAdentro==0){
-  78  150  		    cout<<"	Administrador "<<id<<" intenta ingresar"<<endl;
-  79  155  	}
-  80  155  			if(habVacia==0){
-  81  159  				if(adminAdentro==0){
-  82  163  				cout<<"      Entra Administrador"<<id<<endl;	
-  83  167  				cout<<"      Revisa Administrador"<<id<<endl;				
-  84  171  				adminAdentro=1;
-  85  174  				}
-  86  174  				habVacia=1;
-  87  177  				cout<<"      SALE Administrador"<<id<<endl;	
-  88  181  				habVacia=0;
-  89  184                                  adminAdentro=0;
-  90  187                           }else{ if(cantEst >= cantMax){
-  91  192  				if(adminAdentro==0){
-  92  196  				cout<<"      Entra Administrador"<<id<<" logra ingresar"<<endl;
-  93  201  				cout<<"      Termina la fiesta Administrador"<<id<<endl;	
-  94  205  				terminaFiesta=1;
-  95  208  				adminAdentro=1;
-  96  211  				}
-  97  211  				cout<<"      Revisa Administrador"<<id<<endl;	
-  98  215  				
-  99  215  				wait(adminIN);
- 100  217  				if(habVacia==0){
- 101  221  					cout<<"      SALE Administrador"<<id<<endl;
- 102  225  					adminAdentro=0;
- 103  228  					signal(adminIN);
- 104  230  				}else{
- 105  231  					if(cantEst!=0){
- 106  235  					  signal(estSale);
- 107  237  					}
- 108  237  				}
- 109  237  				
- 110  237  
- 111  237                                }else{ 
- 112  238  				cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
- 113  243  				signal(acceso);
- 114  245  				break;
- 115  246                                }
- 116  246  				//cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
- 117  246  				//
- 118  246  			}
- 119  246  			signal(acceso);
- 120  248  		  
- 121  248   }  //while 
- 122  249  }
- 123  250  void main(){
- 124  251     cobegin{
- 125  252                  estudiante(1);estudiante(2);estudiante(3);estudiante(4);
- 126  268  		administrador(99);
- 127  272       }
- 128  273  }
+  42   85  						cout<<"TODOS salieron"<<endl;
+  43   87  						signal(adminIN);
+  44   89  						}else{
+  45   90  						  signal(estSale); //todavia puede salir otro estudiante
+  46   92  						}
+  47   92  					
+  48   92  					
+  49   92                                   }else{  
+  50   93  					while(1){
+  51   95  					  if(terminaFiesta==1 || (id!=ultSal)){
+  52  103  						cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
+  53  109  						cantEst--;
+  54  114  						cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
+  55  120  						if(cantEst==0){
+  56  124  						  habVacia=0; //administrador pueda entrar
+  57  127  						  terminaFiesta=0;
+  58  130  						  cout<<"TODOS salieron"<<endl;
+  59  132  						  ultSal=id;  //no debe poder salir de nuevo
+  60  135  						  signal(adminIN);
+  61  137  						  
+  62  137  						}else{
+  63  138  						  //signal(estSale); //todavia puede salir otro estudiante
+  64  138  						  signal(adminIN);  //el admin intente salir y libere no asegura que pase estSale=-1
+  65  140  						  ultSal=id;
+  66  143  						}//cantEs
+  67  143  						//sigue habiendo estudiantes
+  68  143  						
+  69  143  						//break;//creo que deberia haber un wait
+  70  143  					   }else{signal(adminIN);  cout<<"  NO Sale "<<id<<" Estudiante"<<'\n';break;  }//pausar el sale
+  71  153  						//se sigue reduciendo el estSal (PROBLEMA)
+  72  153  					}//while
+  73  154  						
+  74  154  					}//si no sale? else
+  75  154                                } //IF habVacia
+  76  154                
+  77  154     // signal(estSale);
+  78  154  }
+  79  155  void administrador(int id){
+  80  155   while(1){
+  81  157                     wait(acceso);  //
+  82  159  	if(adminAdentro==0){
+  83  163  		    cout<<"	Administrador "<<id<<" intenta ingresar"<<endl;
+  84  168  	}
+  85  168  			if(habVacia==0){
+  86  172  				if(adminAdentro==0){
+  87  176  				cout<<"      Entra Administrador"<<id<<endl;	
+  88  180  				cout<<"      Revisa Administrador"<<id<<endl;				
+  89  184  				adminAdentro=1;
+  90  187  				}
+  91  187  				habVacia=1;
+  92  190  				cout<<"      SALE Administrador"<<id<<endl;	
+  93  194  				habVacia=0;
+  94  197                                  adminAdentro=0;
+  95  200                           }else{ if(cantEst >= cantMax){
+  96  205  				if(adminAdentro==0){
+  97  209  				cout<<"      Entra Administrador"<<id<<" logra ingresar"<<endl;
+  98  214  				cout<<"      Termina la fiesta Administrador"<<id<<endl;	
+  99  218  				terminaFiesta=1;
+ 100  221  				adminAdentro=1;
+ 101  224  				}
+ 102  224  				cout<<"      Revisa Administrador"<<id<<endl;	
+ 103  228  				
+ 104  228  				wait(adminIN);
+ 105  230  				if(habVacia==0){
+ 106  234  					cout<<"      SALE Administrador"<<id<<endl;
+ 107  238  					adminAdentro=0;
+ 108  241  					signal(adminIN);
+ 109  243  				}else{
+ 110  244  					if(cantEst!=0){
+ 111  248  					  signal(estSale);
+ 112  250  					}
+ 113  250  				}
+ 114  250  				
+ 115  250  
+ 116  250                                }else{ 
+ 117  251  				cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
+ 118  256  				signal(acceso);
+ 119  258  				break;
+ 120  259                                }
+ 121  259  				//cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
+ 122  259  				//
+ 123  259  			}
+ 124  259  			signal(acceso);
+ 125  261  		  
+ 126  261   }  //while 
+ 127  262  }
+ 128  263  void main(){
+ 129  264     cobegin{
+ 130  265                  estudiante(1);estudiante(2);estudiante(3);estudiante(4);
+ 131  281  		administrador(99);
+ 132  285       }
+ 133  286  }

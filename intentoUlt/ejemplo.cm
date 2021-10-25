@@ -1,13 +1,13 @@
 semaphore acceso=1; //puerta
 semaphore adminIN=1; //administrador
-semaphore estSale=1;
+semaphore estSale=2;
 int adminAdentro=0;
 int habVacia=0;
 int cantEst=0;
 int cantMax=2;//varia
 int numRandom;
 int terminaFiesta=0;// no es seguro
-
+int ultSal=0;
 void estudiante(int id){
 //int x=0;
                
@@ -39,6 +39,7 @@ void estudiante(int id){
 					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
 					if(cantEst==0){
 						habVacia=0; //administrador pueda entrar
+						cout<<"TODOS salieron"<<endl;
 						signal(adminIN);
 						}else{
 						  signal(estSale); //todavia puede salir otro estudiante
@@ -47,23 +48,27 @@ void estudiante(int id){
 					
                                  }else{  
 					while(1){
-					  if(terminaFiesta==1 || (cantEst!=0)){
+					  if(terminaFiesta==1 || (id!=ultSal)){
 						cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 						cantEst--;
 						cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
 						if(cantEst==0){
 						  habVacia=0; //administrador pueda entrar
-						  signal(adminIN);
+						  terminaFiesta=0;
 						  cout<<"TODOS salieron"<<endl;
+						  ultSal=id;  //no debe poder salir de nuevo
+						  signal(adminIN);
+						  
 						}else{
 						  //signal(estSale); //todavia puede salir otro estudiante
-						  signal(adminIN);  //el admin intente salir y libere 
+						  signal(adminIN);  //el admin intente salir y libere no asegura que pase estSale=-1
+						  ultSal=id;
 						}//cantEs
 						//sigue habiendo estudiantes
 						
 						//break;//creo que deberia haber un wait
-					   }else{cout<<"  NO Sale "<<id<<" Estudiante"<<'\n';break;  }//pausar el sale
-						
+					   }else{signal(adminIN);  cout<<"  NO Sale "<<id<<" Estudiante"<<'\n';break;  }//pausar el sale
+						//se sigue reduciendo el estSal (PROBLEMA)
 					}//while
 						
 					}//si no sale? else
