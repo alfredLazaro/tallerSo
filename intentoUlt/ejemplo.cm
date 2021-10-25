@@ -25,13 +25,13 @@ void estudiante(int id){
 				cantEst++;
 				cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
 				
-				signal(acceso);
+				signal(acceso);  //entra y puede entrar otro
 				
                              } //else estEntra
 //fuera de else
                              wait(estSale);
                                if(habVacia==1){
-				cout<<"	IIISalir Estudiante"<<'\n';
+				cout<<"	IIISalir "<<id<<" Estudiante"<<'\n';
 				numRandom = random(3);
 				if(numRandom==0){   //no hace la comparacion con terminaFies
 					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
@@ -45,58 +45,80 @@ void estudiante(int id){
 						}
 					
 					
-                                 }else{  cout<<"  NO Sale    "<<'\n';
+                                 }else{  
 					while(1){
-					  if(terminaFiesta==1){
+					  if(terminaFiesta==1 || (cantEst!=0)){
 						cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
 						cantEst--;
 						cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
 						if(cantEst==0){
 						  habVacia=0; //administrador pueda entrar
 						  signal(adminIN);
+						  cout<<"TODOS salieron"<<endl;
 						}else{
-						  signal(estSale); //todavia puede salir otro estudiante
+						  //signal(estSale); //todavia puede salir otro estudiante
+						  signal(adminIN);  //el admin intente salir y libere 
 						}//cantEs
-					   }else{break;  signal(estSale);//pausar el sale}
+						//sigue habiendo estudiantes
+						
+						//break;//creo que deberia haber un wait
+					   }else{cout<<"  NO Sale "<<id<<" Estudiante"<<'\n';break;  }//pausar el sale
+						
 					}//while
+						
 					}//si no sale? else
                               } //IF habVacia
-              }//
+              
    // signal(estSale);
 }
 void administrador(int id){
  while(1){
                    wait(acceso);  //
+	if(adminAdentro==0){
 		    cout<<"	Administrador "<<id<<" intenta ingresar"<<endl;
+	}
 			if(habVacia==0){
+				if(adminAdentro==0){
 				cout<<"      Entra Administrador"<<id<<endl;	
 				cout<<"      Revisa Administrador"<<id<<endl;				
 				adminAdentro=1;
+				}
 				habVacia=1;
 				cout<<"      SALE Administrador"<<id<<endl;	
 				habVacia=0;
                                 adminAdentro=0;
-                         }else if(cantEst >= cantMax){
+                         }else{ if(cantEst >= cantMax){
+				if(adminAdentro==0){
 				cout<<"      Entra Administrador"<<id<<" logra ingresar"<<endl;
 				cout<<"      Termina la fiesta Administrador"<<id<<endl;	
-				cout<<"      Revisa Administrador"<<id<<endl;	
 				terminaFiesta=1;
 				adminAdentro=1;
+				}
+				cout<<"      Revisa Administrador"<<id<<endl;	
+				
 				wait(adminIN);
 				if(habVacia==0){
 					cout<<"      SALE Administrador"<<id<<endl;
 					adminAdentro=0;
 					signal(adminIN);
 				}else{
-					signal(estSale);
+					if(cantEst!=0){
+					  signal(estSale);
+					}
 				}
 				
 
                               }else{ 
 				cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
+				signal(acceso);
+				break;
                               }
-		  signal(acceso);
- }   
+				//cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
+				//
+			}
+			signal(acceso);
+		  
+ }  //while 
 }
 void main(){
    cobegin{

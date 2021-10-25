@@ -1,0 +1,81 @@
+semaphore acceso=1; //puerta
+semaphore adminIN=1; //administrador
+semaphore estSale=0;
+int adminAdentro=0;
+int habVacia=0;
+int cantEst=0;
+int cantMax=2;//varia
+int numRandom;
+int terminaFiesta=0;// no es seguro
+int votarEst=0;
+void estudiante(int id){
+int x=0;
+               
+		wait(acceso);
+		
+		cout<<"Intenta ingresar Estudiante"<<id<<endl;
+		if(adminAdentro==1){
+			cout<<"Acceso denegado Estudiante  "<<id<<endl;
+  
+			signal(acceso);
+			
+			}else{  
+				cout<<"Entra Estudiante "<<id <<" a la habitacion"<<'\n';
+				votarEst=0;
+				habVacia=1;
+				cantEst++;
+				cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
+				signal(acceso);
+                             }
+//fuera de else
+                     
+                              
+			
+				wait(acceso);  //no detiene al proceso un estudiante puede salir sin entrar
+				if(cantEst>0){
+					cout<<"Sale Estudiante "<<id <<" de la habitacion"<<'\n';
+					cantEst--;
+					cout<<"Hay " <<cantEst<< " estudiantes"<<'\n';
+					if(cantEst==0){
+						habVacia=0; //administrador pueda entrar
+						cout<<"Salieron todos los estudiantes"<<'\n';
+						adminAdentro=0;
+					}
+                                }
+signal(acceso);
+}
+void administrador(int id){
+ while(1){
+                   wait(acceso);
+if(adminAdentro==0){
+		    cout<<"	Administrador "<<id<<" intenta ingresar"<<endl;
+}
+			if(habVacia==0){
+				if(adminAdentro==0){
+				cout<<"      Entra Administrador"<<id<<endl;
+				}
+				cout<<"      Revisa Administrador"<<id<<endl;				
+				cout<<"      SALE Administrador"<<id<<endl;	
+                         }else if(cantEst >= cantMax){
+				if(adminAdentro==0){
+				cout<<"      Entra Administrador"<<id<<" logra ingresar"<<endl;
+				cout<<"      Termina la fiesta Administrador"<<id<<endl;	
+				} 
+				cout<<"	     revisa la habitacion"<<id<<'\n';
+				adminAdentro=1;
+                                signal(acceso);
+				
+                              }else{ 
+				cout<<"      Administrador "<<id<<" acceso denegado"<<endl;
+                              }
+		  signal(acceso);
+ }   
+}
+void main(){
+   cobegin{
+		administrador(99);
+                estudiante(1);estudiante(2);estudiante(3);estudiante(4);estudiante(5);
+		estudiante(6);estudiante(8);estudiante(9);
+		
+     }
+}
